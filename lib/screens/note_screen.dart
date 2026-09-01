@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:note/models/note.dart';
 import 'package:note/widgets/empty_notes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/note_card.dart';
 import 'add_note_screen.dart';
@@ -13,7 +16,41 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesListScreenState extends State<NotesScreen> {
+  static const String _storageKey = 'notes';
+
   final List<Note> _notes = <Note>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotes();
+  }
+
+  Future<void> _loadNotes() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? stored = prefs.getString(_storageKey);
+    if (stored == null) return;
+    if (!mounted) return;
+
+    final List<dynamic> decoded = jsonDecode(stored) as List<dynamic>;
+    setState(() {
+      _notes
+        ..clear()
+        ..addAll(
+          decoded.map(
+            (dynamic e) => Note.fromJson(e as Map<String, dynamic>),
+          ),
+        );
+    });
+  }
+
+  Future<void> _saveNotes() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _storageKey,
+      jsonEncode(_notes.map((Note n) => n.toJson()).toList()),
+    );
+  }
 
   Future<void> _openEditor({Note? noteToEdit}) async {
     final Note? result = await Navigator.of(context).push<Note>(
@@ -33,6 +70,7 @@ class _NotesListScreenState extends State<NotesScreen> {
         if (index != -1) _notes[index] = result;
       }
     });
+    _saveNotes();
   }
 
   void _deleteNote(Note note) {
@@ -40,6 +78,7 @@ class _NotesListScreenState extends State<NotesScreen> {
     if (index == -1) return;
 
     setState(() => _notes.removeAt(index));
+    _saveNotes();
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -48,7 +87,10 @@ class _NotesListScreenState extends State<NotesScreen> {
           content: const Text('Note deleted'),
           action: SnackBarAction(
             label: 'Undo',
-            onPressed: () => setState(() => _notes.insert(index, note)),
+            onPressed: () {
+              setState(() => _notes.insert(index, note));
+              _saveNotes();
+            },
           ),
         ),
       );

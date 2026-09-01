@@ -11,6 +11,24 @@ class Note {
   final DateTime createdAt;
   final String description;
 
+  factory Note.fromJson(Map<String, dynamic> json) {
+    return Note(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      description: json['description'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'createdAt': createdAt.toIso8601String(),
+      'description': description,
+    };
+  }
+
   Note copyWith({String? title, String? description}) {
     return Note(
       id: id,

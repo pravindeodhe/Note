@@ -1,4 +1,18 @@
-# note
+lib
+main.dart - app entry and theme
+models/note.dart - Note data class
+screens - notes list, add/edit note
+widgets - note card, empty state
+
+
+
+## How it works
+
+i) Tap the + Yellow button at the bottom right the New Note screen opens.
+ii) Enter a title (required) and description (optional), then tap Save note.
+iii) The note appears at the top of the notes list.
+iv) Tap any note to edit it. Tap the delete icon to remove it, with an undo option.
+
 
 A new Flutter project.
 
