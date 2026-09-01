@@ -1,8 +1,8 @@
 lib
-main.dart - app entry and theme
-models/note.dart - Note data class
-screens - notes list, add/edit note
-widgets - note card, empty state
+i) main.dart - app entry and theme
+ii) models/note.dart - Note data class
+iii) screens - notes list, add/edit note
+iv) widgets - note card, empty state
 
 
 
